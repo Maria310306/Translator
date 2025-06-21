@@ -1,13 +1,18 @@
+import subprocess
+import sys
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv"])
+    from dotenv import load_dotenv
+
 import os
 import streamlit as st
-from dotenv import load_dotenv
 import google.generativeai as genai
-
 
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
-
-
 genai.configure(api_key=api_key)
 
 languages = sorted([
@@ -17,7 +22,6 @@ languages = sorted([
 ])
 
 st.set_page_config(page_title="🌍 AI Translator", layout="centered")
-
 
 st.markdown("""
     <style>
@@ -42,13 +46,11 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-
 st.markdown("## 🌐 AI Translator")
 st.markdown("Translate your English text into **25+ global languages** using Gemini AI.")
 st.markdown("Created with ❤️ by Maria Kousar")
 
 st.markdown("---")
-
 
 st.markdown("### 📝 Enter Text")
 text = st.text_area("Enter English text:", height=140, placeholder="Type something like: Hello, how are you?")
@@ -57,7 +59,6 @@ st.markdown("### 🌍 Select Language")
 lang = st.selectbox("Target language:", languages)
 
 btn = st.button("🔁 Translate")
-
 
 if btn and text:
     try:
