@@ -1,14 +1,34 @@
+# 
+
 import os
 import streamlit as st
-from dotenv import load_dotenv
+# from dotenv import load_dotenv # Option 1: Comment out if using st.secrets exclusively
 import google.generativeai as genai
 
+# --- API Key Configuration ---
+# On Streamlit Cloud, st.secrets is the recommended way to handle sensitive info.
+# You need to add your GEMINI_API_KEY to your Streamlit app's secrets.toml
+# (or directly in the Streamlit Cloud app settings under "Secrets").
+#
+# Example content for Streamlit Cloud's "Secrets" text area (TOML format):
+# GEMINI_API_KEY = "YOUR_ACTUAL_GEMINI_API_KEY_HERE"
+#
+# If you are still developing locally and using a .env file:
+# load_dotenv() # Uncomment this line if you are running locally with a .env file
 
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-
+try:
+    # Attempt to get the API key from Streamlit secrets (for deployed apps)
+    api_key = st.secrets["GEMINI_API_KEY"]
+except KeyError:
+    # Fallback to os.getenv (for local development with .env or if directly set in system env)
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        st.error("GEMINI_API_KEY not found! Please set it in Streamlit Secrets or a .env file.")
+        st.stop() # Stop the app if API key is not found
 
 genai.configure(api_key=api_key)
+
+# --- Rest of your Streamlit App Code ---
 
 languages = sorted([
     "Urdu", "French", "Spanish", "German", "Chinese", "Japanese", "Korean", "Arabic",
