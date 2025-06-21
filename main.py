@@ -1,14 +1,13 @@
+import os
 import streamlit as st
+from dotenv import load_dotenv
 import google.generativeai as genai
 
-# Get API key from Streamlit Secrets, fallback to environment variable if not found
-try:
-    api_key = st.secrets["GEMINI_API_KEY"]
-except KeyError:
-    import os
-    api_key = os.getenv("GEMINI_API_KEY")
 
-# Configure the Gemini AI client with the API key
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+
+
 genai.configure(api_key=api_key)
 
 languages = sorted([
@@ -18,6 +17,7 @@ languages = sorted([
 ])
 
 st.set_page_config(page_title="🌍 AI Translator", layout="centered")
+
 
 st.markdown("""
     <style>
@@ -42,11 +42,13 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+
 st.markdown("## 🌐 AI Translator")
 st.markdown("Translate your English text into **25+ global languages** using Gemini AI.")
 st.markdown("Created with ❤️ by Maria Kousar")
 
 st.markdown("---")
+
 
 st.markdown("### 📝 Enter Text")
 text = st.text_area("Enter English text:", height=140, placeholder="Type something like: Hello, how are you?")
@@ -55,6 +57,7 @@ st.markdown("### 🌍 Select Language")
 lang = st.selectbox("Target language:", languages)
 
 btn = st.button("🔁 Translate")
+
 
 if btn and text:
     try:
@@ -65,12 +68,7 @@ if btn and text:
 
         st.markdown("### ✅ Translation")
         st.success(f"Translated to **{lang}**:")
-        st.markdown(
-            f"<div style='font-size:20px; color:#1a1a1a; padding:10px; "
-            f"background-color:#eaf4ff; border-left: 4px solid #1f77b4; "
-            f"border-radius:4px'>{response.text}</div>",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"<div style='font-size:20px; color:#1a1a1a; padding:10px; background-color:#eaf4ff; border-left: 4px solid #1f77b4; border-radius:4px'>{response.text}</div>", unsafe_allow_html=True)
 
     except Exception as e:
         st.error(f"❌ Error: {str(e)}")
