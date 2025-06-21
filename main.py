@@ -1,11 +1,13 @@
 import os
 import streamlit as st
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 import google.generativeai as genai
 
+api_key = st.secrets["GEMINI_API_KEY"]
 
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+
+# load_dotenv()
+# api_key = os.getenv("GEMINI_API_KEY")
 
 
 genai.configure(api_key=api_key)
