@@ -1,16 +1,32 @@
 import os
 import streamlit as st
-from dotenv import load_dotenv
+
+# Determine environment: Streamlit Cloud or local
+running_on_streamlit_cloud = "STREAMLIT_SERVER_PORT" in os.environ
+
+if running_on_streamlit_cloud:
+    # On Streamlit Cloud, read from secrets.toml
+    try:
+        api_key = st.secrets["GEMINI_API_KEY"]
+    except KeyError:
+        st.error("GEMINI_API_KEY not found in Streamlit secrets! Please add it there.")
+        st.stop()
+else:
+    # Local environment: load from .env file or environment variables
+    from dotenv import load_dotenv
+    load_dotenv()
+    api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    st.error("API key not found. Please set GEMINI_API_KEY in your environment or secrets.toml file.")
+    st.stop()
+
 import google.generativeai as genai
 
-# Load environment variables
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
-
-# Set Gemini key
+# Configure Gemini AI with your API key
 genai.configure(api_key=api_key)
 
-# Supported Languages
+# Supported Languages (sorted for nicer UI)
 languages = sorted([
     "Urdu", "French", "Spanish", "German", "Chinese", "Japanese", "Korean", "Arabic",
     "Portuguese", "Russian", "Hindi", "Bengali", "Turkish", "Italian", "Dutch", "Greek",
@@ -47,7 +63,7 @@ st.markdown("""
 # --- Title and Info ---
 st.markdown("## 🌐 AI Translator")
 st.markdown("Translate your English text into **25+ global languages** using Gemini AI.")
-st.markdown("Created with ❤️ by **Maria Kousar** ")
+st.markdown("Created with ❤️ by **Maria Kousar**")
 
 st.markdown("---")
 
@@ -71,7 +87,11 @@ if btn and text:
 
         st.markdown("### ✅ Translation")
         st.success(f"Translated to **{lang}**:")
-        st.markdown(f"<div style='font-size:20px; color:#1a1a1a; padding:10px; background-color:#eaf4ff; border-left: 4px solid #1f77b4; border-radius:4px'>{response.text}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:20px; color:#1a1a1a; padding:10px; background-color:#eaf4ff; "
+            f"border-left: 4px solid #1f77b4; border-radius:4px'>{response.text}</div>",
+            unsafe_allow_html=True
+        )
 
     except Exception as e:
         st.error(f"❌ Error: {str(e)}")
