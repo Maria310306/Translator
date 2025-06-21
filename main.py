@@ -1,18 +1,14 @@
-import subprocess
-import sys
-
-try:
-    from dotenv import load_dotenv
-except ImportError:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "python-dotenv"])
-    from dotenv import load_dotenv
-
-import os
 import streamlit as st
 import google.generativeai as genai
 
-load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+# Get API key from Streamlit Secrets, fallback to environment variable if not found
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except KeyError:
+    import os
+    api_key = os.getenv("GEMINI_API_KEY")
+
+# Configure the Gemini AI client with the API key
 genai.configure(api_key=api_key)
 
 languages = sorted([
@@ -69,7 +65,12 @@ if btn and text:
 
         st.markdown("### ✅ Translation")
         st.success(f"Translated to **{lang}**:")
-        st.markdown(f"<div style='font-size:20px; color:#1a1a1a; padding:10px; background-color:#eaf4ff; border-left: 4px solid #1f77b4; border-radius:4px'>{response.text}</div>", unsafe_allow_html=True)
+        st.markdown(
+            f"<div style='font-size:20px; color:#1a1a1a; padding:10px; "
+            f"background-color:#eaf4ff; border-left: 4px solid #1f77b4; "
+            f"border-radius:4px'>{response.text}</div>",
+            unsafe_allow_html=True
+        )
 
     except Exception as e:
         st.error(f"❌ Error: {str(e)}")
